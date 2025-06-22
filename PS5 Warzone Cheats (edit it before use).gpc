@@ -1,0 +1,61 @@
+// PS5 Warzone Private Match Script
+// Anti-Recoil + Rapid Fire + Toggles
+
+int fire_btn = PS5_R2;
+int aim_btn = PS5_L2;
+
+// Mod toggles
+int rapid_fire_enabled = TRUE;
+int anti_recoil_enabled = TRUE;
+
+// Mod settings
+int rapid_delay = 35;       // Delay between shots
+int recoil_strength = 30;   // Strength of recoil control (lower for lighter guns)
+
+// Toggle state
+int hold_L1 = FALSE;
+
+main {
+    // --- TOGGLE HANDLER ---
+    if(get_val(PS5_L1)) hold_L1 = TRUE;
+    else hold_L1 = FALSE;
+
+    if(hold_L1 && event_press(PS5_UP)) {
+        rapid_fire_enabled = !rapid_fire_enabled;
+        combo_run(RumbleNotify);
+    }
+
+    if(hold_L1 && event_press(PS5_DOWN)) {
+        anti_recoil_enabled = !anti_recoil_enabled;
+        combo_run(RumbleNotify);
+    }
+
+    // --- RAPID FIRE ---
+    if(rapid_fire_enabled && get_val(fire_btn)) {
+        combo_run(RapidFire);
+    }
+
+    // --- ANTI-RECOIL ---
+    if(anti_recoil_enabled && get_val(fire_btn)) {
+        combo_run(AntiRecoil);
+    }
+}
+
+// ---- COMBOS ----
+combo RapidFire {
+    set_val(fire_btn, 100);
+    wait(rapid_delay);
+    set_val(fire_btn, 0);
+    wait(rapid_delay);
+}
+
+combo AntiRecoil {
+    set_val(STICK_2_Y, recoil_strength);
+    wait(40);
+}
+
+combo RumbleNotify {
+    set_rumble(RUMBLE_B, 100);
+    wait(300);
+    reset_rumble();
+}
